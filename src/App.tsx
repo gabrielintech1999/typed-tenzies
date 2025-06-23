@@ -1,35 +1,74 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+
+type Die = {
+  id: number;
+  value: number;
+  isSelected: boolean;
+};
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [dice, setDice] = useState<Die[]>(allNewDice());
+
+  function generateNewDie(): Die {
+    return {
+      id: Math.random(), // Gera um ID único
+      value: Math.ceil(Math.random() * 6), // Valor entre 1 e 6
+      isSelected: false,
+    };
+  }
+
+  function allNewDice() {
+    const newDice: Die[] = [];
+    for (let i = 0; i < 10; i++) {
+      newDice.push(generateNewDie());
+    }
+    return newDice;
+  }
+
+  function selectDie(id: number): void {
+    let upadtedDice = dice.map((die) =>
+      die.id === id ? { ...die, isSelected: !die.isSelected } : die
+    );
+
+    setDice(upadtedDice);
+  }
+
+  console.log(dice);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div>
+      <div className="container">
+        {dice.map((die) => (
+          <Die
+            key={die.id}
+            value={die.value}
+            isSelected={die.isSelected}
+            handleClick={() => selectDie(die.id)}
+          />
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      <button onClick={allNewDice}>Generate Dice</button>
+    </div>
+  );
 }
 
-export default App
+type DieProps = {
+  value: number;
+  isSelected: boolean;
+  handleClick: () => void;
+};
+
+function Die({ isSelected, value, handleClick }: DieProps) {
+  return (
+    <div
+      style={{ background: isSelected ? "red" : "" }}
+      onClick={handleClick}
+      className="die"
+    >
+      {value}
+    </div>
+  );
+}
+
+export default App;
